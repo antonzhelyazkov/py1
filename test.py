@@ -61,3 +61,12 @@ for media in config_data['media'].values():
 
 for host in config_data['ftp_hosts']:
     print(host)
+
+for media in config_data['media']:
+    path_json = config_data['dst_dir'].rstrip('/') + '/' + media + '.json'
+    print(path_json)
+    isJsonFile = os.path.isfile(path_json)
+    if isJsonFile:
+        print("json file " + path_json + " found")
+    else:
+        print("json file " + path_json + " NOT found")
