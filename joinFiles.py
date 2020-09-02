@@ -134,7 +134,6 @@ else:
 for media in config_data['media']:
     path_json = config_data['dst_dir'].rstrip('/') + '/' + media + '.json'
     path_chunks = config_data['path_chunks'].rstrip('/') + '/' + media
-#    files = os.listdir(path_chunks)
 
     isdir = os.path.isdir(path_chunks)
     if isdir:
