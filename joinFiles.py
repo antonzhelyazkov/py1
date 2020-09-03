@@ -156,8 +156,9 @@ for media in config_data['media']:
         expected_start = int(item['start']) - int(config_data['seconds_before_start'])
         expected_end = int(item['end']) + int(config_data['seconds_after_end'])
         if expected_end < currentTS and item['processed'] == 'false':
-            dst_dir = dst_root + "/" + media + "_" + item['name'] + "_" + datetime.fromtimestamp(
-                int(item['start'])).strftime('%Y-%m-%d_%H-%M-%S')
+            issue_name = media + "_" + item['name'] + "_" + \
+                         datetime.fromtimestamp(int(item['start'])).strftime('%Y-%m-%d_%H-%M-%S')
+            dst_dir = dst_root + "/" + issue_name
             if os.path.exists(dst_dir):
                 shutil.rmtree(dst_dir)
                 os.makedirs(dst_dir)
@@ -165,8 +166,6 @@ for media in config_data['media']:
                 os.makedirs(dst_dir)
             chunk_list_file = dst_dir + "/chunks.txt"
             ffmpeg_output_file = dst_dir + "/output.txt"
-            issue_name = media + "_" + item['name'] + "_" + \
-                         datetime.fromtimestamp(int(item['start'])).strftime('%Y-%m-%d_%H-%M-%S')
             destination_file = dst_dir + "/" + issue_name + ".mp4"
             create_chlist(expected_start, expected_end, chunk_list_file, media)
             join_files(chunk_list_file, destination_file)
