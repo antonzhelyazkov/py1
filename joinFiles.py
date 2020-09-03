@@ -155,9 +155,8 @@ for media in config_data['media']:
     for item in data:
         expected_start = int(item['start']) - int(config_data['seconds_before_start'])
         expected_end = int(item['end']) + int(config_data['seconds_after_end'])
+        issue_name = media + "_" + item['name'] + "_" + datetime.fromtimestamp(int(item['start'])).strftime('%Y-%m-%d_%H-%M-%S')
         if expected_end < currentTS and item['processed'] == 'false':
-            issue_name = media + "_" + item['name'] + "_" + \
-                         datetime.fromtimestamp(int(item['start'])).strftime('%Y-%m-%d_%H-%M-%S')
             dst_dir = dst_root + "/" + issue_name
             if os.path.exists(dst_dir):
                 shutil.rmtree(dst_dir)
