@@ -170,7 +170,7 @@ for media in config_data['media']:
             create_chlist(expected_start, expected_end, chunk_list_file, media)
             join_files(chunk_list_file, destination_file)
             if check_duration(destination_file, expected_start, expected_end):
-                print("OK", item['name'])
+                print("OK", issue_name)
                 if ftp_upload(destination_file):
                     item['processed'] = 'true'
                     with open(path_json, 'w') as json_file:
@@ -181,15 +181,15 @@ for media in config_data['media']:
                 else:
                     print("ERR problem in FTP upload", item['name'])
             else:
-                print("ERR", item['name'])
+                print("ERR", issue_name)
                 item['processed'] = 'err'
                 with open(path_json, 'w') as json_file:
                     json.dump(data, json_file)
                 json_file.close()
                 shutil.rmtree(dst_dir)
         elif expected_end < currentTS and item['processed'] == 'true':
-            print(item['name'], "Already Done", time.ctime(expected_start), time.ctime(expected_end))
+            print(issue_name, "Already Done", time.ctime(expected_start), time.ctime(expected_end))
         else:
-            print(item['name'], "Not ready", time.ctime(expected_start), time.ctime(expected_end))
+            print(issue_name, "Not ready", time.ctime(expected_start), time.ctime(expected_end))
 
 os.remove(pid_file)
