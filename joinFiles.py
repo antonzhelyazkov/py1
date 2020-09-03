@@ -25,7 +25,6 @@ for opt, arg in opts:
     else:
         print("HELP")
 
-
 currentTS = int(time.time())
 
 
@@ -80,7 +79,7 @@ def insert_mysql(media_name, issue):
         password=config_data['mysql_pass'],
         database=config_data['mysql_db']
     )
-    print(vod_conn)
+
     sql = "INSERT INTO video_prod (media_tag, issue_name, ts_file_name, status) VALUES (%s, %s, %s, %s)"
     val = (media_name, issue, issue, "ready_for_cut")
     curs = vod_conn.cursor()
@@ -166,8 +165,9 @@ for media in config_data['media']:
                 os.makedirs(dst_dir)
             chunk_list_file = dst_dir + "/chunks.txt"
             ffmpeg_output_file = dst_dir + "/output.txt"
-            destination_file = dst_dir + "/" + media + "_" + item['name'] + "_" + datetime.fromtimestamp(
-                int(item['start'])).strftime('%Y-%m-%d_%H-%M-%S') + ".mp4"
+            issue_name = media + "_" + item['name'] + "_" + \
+                         datetime.fromtimestamp(int(item['start'])).strftime('%Y-%m-%d_%H-%M-%S')
+            destination_file = dst_dir + "/" + issue_name + ".mp4"
             create_chlist(expected_start, expected_end, chunk_list_file, media)
             join_files(chunk_list_file, destination_file)
             if check_duration(destination_file, expected_start, expected_end):
@@ -178,7 +178,7 @@ for media in config_data['media']:
                         json.dump(data, json_file)
                     json_file.close()
                     shutil.rmtree(dst_dir)
-                    insert_mysql(media, item['name'])
+                    insert_mysql(media, issue_name)
                 else:
                     print("ERR problem in FTP upload", item['name'])
             else:
