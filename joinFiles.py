@@ -81,7 +81,7 @@ def insert_mysql(media_name, issue):
     )
 
     sql = "INSERT INTO video_prod (media_tag, issue_name, ts_file_name, status) VALUES (%s, %s, %s, %s)"
-    val = (media_name, issue, issue, "ready_for_cut")
+    val = (media_name, issue, issue + '.mp4', "ready_for_cut")
     curs = vod_conn.cursor()
     curs.execute(sql, val)
     vod_conn.commit()

@@ -41,6 +41,25 @@ def logfile_to_name(log_filename):
         return i
 
 
+def update_table(file_name, server_ip):
+    vod_conn = mysql.connector.connect(
+        host=config_data['mysql_host'],
+        user=config_data['mysql_user'],
+        password=config_data['mysql_pass'],
+        database=config_data['mysql_db']
+    )
+
+
+def check_status(file_name):
+    vod_conn = mysql.connector.connect(
+        host=config_data['mysql_host'],
+        user=config_data['mysql_user'],
+        password=config_data['mysql_pass'],
+        database=config_data['mysql_db']
+    )
+
+
+
 def ftp_check():
     ftp_path = "log/"
     ftp_map = {}
@@ -61,7 +80,12 @@ def ftp_check():
     return ftp_map
 
 
-def ftp_get_file(server_ip, file_name):
+def ftp_get_file(ftp_server, file_name):
+    local_mp4 = open("d:/" + file_name, 'wb')
+    session = ftplib.FTP(ftp_server)
+    session.login(user=config_data['out_ftp_user'], passwd=config_data['out_ftp_pass'])
+    session.retrbinary('RETR ' + str(file_name.replace('.mp4', ' - Join.mp4')), local_mp4.write, 2048)
+    session.close()
     print(server_ip, file_name)
 
 
