@@ -61,6 +61,10 @@ def ftp_check():
     return ftp_map
 
 
+def ftp_get_file(server_ip, file_name):
+    print(server_ip, file_name)
+
+
 #############
 
 config_open = open(config_file, encoding='utf-8')
@@ -81,8 +85,8 @@ else:
     f.write(str(os.getpid()))
     f.close()
 
-for key, value in ftp_check().items():
-    for val in value:
-        print(key, val)
+for server_ip, issue_arr in ftp_check().items():
+    for issue in issue_arr:
+        ftp_get_file(server_ip, issue)
 
 os.remove(pid_file)
