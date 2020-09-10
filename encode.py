@@ -99,10 +99,11 @@ def ftp_check():
 
 def ftp_get_file(ftp_server, file_to_get, issue_id_local):
     local_mp4 = open(config_data['dst_dir'] + file_to_get, 'wb')
+    remote_mp4 = ftp_check_join(file_to_get, ftp_server)
     session = ftplib.FTP(ftp_server)
     session.login(user=config_data['out_ftp_user'], passwd=config_data['out_ftp_pass'])
     update_status(issue_id_local, "download_started")
-    session.retrbinary('RETR ' + str(file_to_get.replace('.mp4', ' - Join.mp4')), local_mp4.write, 2048)
+    session.retrbinary('RETR ' + remote_mp4, local_mp4.write, 2048)
     update_status(issue_id_local, "download_finished")
     session.close()
 
@@ -166,7 +167,7 @@ for server_ip, issue_arr in ftp_check().items():
         if issue_status:
             # print(server_ip, issue, issue_id)
             print(f"join {ftp_check_join(issue, server_ip)}")
-            # ftp_get_file(server_ip, issue, issue_id)
+            ftp_get_file(server_ip, issue, issue_id)
             # ftp_remove_log(issue, server_ip)
 
 os.remove(pid_file)
