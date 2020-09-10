@@ -146,7 +146,7 @@ pid_file_path = config_data['pid_file_path']
 
 file_name = os.path.basename(sys.argv[0]).split(".")
 pid_file = pid_file_path.rstrip('/') + "/" + file_name[0] + ".pid"
-print(pid_file)
+# print(pid_file)
 
 isPID = os.path.isfile(pid_file)
 if isPID:
@@ -160,12 +160,12 @@ else:
 for server_ip, issue_arr in ftp_check().items():
     print(server_ip, issue_arr)
     for issue in issue_arr:
-        print(issue)
+        # print(issue)
         issue_status, issue_id = check_status(issue)
-        print(issue_status, issue_id)
+        # print(issue_status, issue_id)
         if issue_status:
-            print(server_ip, issue, issue_id)
-            print(ftp_check_join(issue, server_ip))
+            # print(server_ip, issue, issue_id)
+            print(f"join {ftp_check_join(issue, server_ip)}")
             # ftp_get_file(server_ip, issue, issue_id)
             # ftp_remove_log(issue, server_ip)
 
