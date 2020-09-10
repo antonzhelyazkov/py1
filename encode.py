@@ -98,7 +98,7 @@ def ftp_check():
 
 
 def ftp_get_file(ftp_server, file_to_get, issue_id_local):
-    local_mp4 = open(config_data['dst_dir'] + "/" + file_to_get, 'wb')
+    local_mp4 = open(config_data['tmp_dir'] + "/" + file_to_get, 'wb')
     remote_mp4 = ftp_check_join(file_to_get, ftp_server)
     session = ftplib.FTP(ftp_server)
     session.login(user=config_data['out_ftp_user'], passwd=config_data['out_ftp_pass'])
