@@ -5,6 +5,8 @@ import os
 import sys
 import re
 
+import mysql.connector
+
 config_file = "./config.json"
 
 argv = sys.argv[1:]
@@ -27,8 +29,8 @@ for opt, arg in opts:
 
 def parse_log_file(log_file):
     string_to_search = '[Output file information #1]'
-    datastring = open(log_file, encoding='utf16').read()
-    if string_to_search in datastring:
+    data_string = open(log_file, encoding='utf16').read()
+    if string_to_search in data_string:
         return True
     else:
         return False
@@ -37,11 +39,25 @@ def parse_log_file(log_file):
 def logfile_to_name(log_filename):
     pattern = "\[(.*)\]"
     matches = re.findall(pattern, log_filename)
-    for i in matches:
-        return i
+    return matches[0]
 
 
-def update_table(file_name, server_ip):
+def update_status(issue_id_local, status):
+    vod_conn = mysql.connector.connect(
+        host=config_data['mysql_host'],
+        user=config_data['mysql_user'],
+        password=config_data['mysql_pass'],
+        database=config_data['mysql_db']
+    )
+    sql = "update video_prod set status = %s where id = %s"
+    val = (status, issue_id_local)
+    update = vod_conn.cursor()
+    update.execute(sql, val)
+    vod_conn.commit()
+    vod_conn.close()
+
+
+def check_status(file_to_check):
     vod_conn = mysql.connector.connect(
         host=config_data['mysql_host'],
         user=config_data['mysql_user'],
@@ -49,15 +65,15 @@ def update_table(file_name, server_ip):
         database=config_data['mysql_db']
     )
 
+    cursor = vod_conn.cursor()
+    cursor.execute("SELECT sql_no_cache id from video_prod where status = "
+                   "\"ready_for_cut\" and ts_file_name = \"" + file_to_check + "\"")
+    result = cursor.fetchone()
 
-def check_status(file_name):
-    vod_conn = mysql.connector.connect(
-        host=config_data['mysql_host'],
-        user=config_data['mysql_user'],
-        password=config_data['mysql_pass'],
-        database=config_data['mysql_db']
-    )
-
+    if result:
+        return True, result[0]
+    else:
+        return False, result
 
 
 def ftp_check():
@@ -67,6 +83,7 @@ def ftp_check():
         tmp_arr = []
         session = ftplib.FTP(ftp_server)
         session.login(user=config_data['out_ftp_user'], passwd=config_data['out_ftp_pass'])
+
         for name, facts in session.mlsd(ftp_path):
             filename = 'd:/' + name
             localfile = open(filename, 'wb')
@@ -80,13 +97,44 @@ def ftp_check():
     return ftp_map
 
 
-def ftp_get_file(ftp_server, file_name):
-    local_mp4 = open("d:/" + file_name, 'wb')
+def ftp_get_file(ftp_server, file_to_get, issue_id_local):
+    local_mp4 = open("d:/" + file_to_get, 'wb')
     session = ftplib.FTP(ftp_server)
     session.login(user=config_data['out_ftp_user'], passwd=config_data['out_ftp_pass'])
-    session.retrbinary('RETR ' + str(file_name.replace('.mp4', ' - Join.mp4')), local_mp4.write, 2048)
+    update_status(issue_id_local, "download_started")
+    session.retrbinary('RETR ' + str(file_to_get.replace('.mp4', ' - Join.mp4')), local_mp4.write, 2048)
+    update_status(issue_id_local, "download_finished")
     session.close()
-    print(server_ip, file_name)
+
+
+def ftp_remove_log(file_to_get, ftp_server):
+    ftp_path = "log/"
+    session = ftplib.FTP(ftp_server)
+    session.login(user=config_data['out_ftp_user'], passwd=config_data['out_ftp_pass'])
+
+    for name, facts in session.mlsd(ftp_path):
+        if file_to_get in name:
+            print(ftp_path + name)
+            session.delete(ftp_path + name)
+    session.close()
+
+
+def ftp_check_join(file_to_get, ftp_server):
+    files_arr = []
+    session = ftplib.FTP(ftp_server)
+    session.login(user=config_data['out_ftp_user'], passwd=config_data['out_ftp_pass'])
+
+    for name, facts in session.mlsd():
+        if facts['type'] == "file":
+            files_arr.append(name)
+    session.close()
+
+    if file_to_get in files_arr:
+        return file_to_get
+    elif file_to_get.replace('.mp4', ' - Join.mp4') in files_arr:
+        return file_to_get.replace('.mp4', ' - Join.mp4')
+    else:
+        return None
 
 
 #############
@@ -110,7 +158,15 @@ else:
     f.close()
 
 for server_ip, issue_arr in ftp_check().items():
+    print(server_ip, issue_arr)
     for issue in issue_arr:
-        ftp_get_file(server_ip, issue)
+        print(issue)
+        issue_status, issue_id = check_status(issue)
+        print(issue_status, issue_id)
+        if issue_status:
+            print(server_ip, issue, issue_id)
+            print(ftp_check_join(issue, server_ip))
+            # ftp_get_file(server_ip, issue, issue_id)
+            # ftp_remove_log(issue, server_ip)
 
 os.remove(pid_file)
