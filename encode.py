@@ -214,7 +214,7 @@ def encode_files_fhd(file_to_encode, issue_id_local):
 def insert_upload(file_to_register):
     ip = requests.get('https://checkip.amazonaws.com').text.strip()
     split_file_name = file_to_register.split("_")
-    quality_suffix = split_file_name[3].split(".")
+    quality_suffix = split_file_name[4].split(".")
     vod_conn = mysql.connector.connect(
         host=config_data['mysql_host'],
         user=config_data['mysql_user'],
