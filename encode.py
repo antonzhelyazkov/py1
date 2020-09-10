@@ -254,10 +254,10 @@ for server_ip, issue_arr in ftp_check().items():
     for issue in issue_arr:
         # print(issue)
         issue_status, issue_id = check_status(issue)
-        # print(issue_status, issue_id)
+        print(issue_status, issue_id)
         if issue_status:
             print(server_ip, issue, issue_id)
-            # print(f"join {ftp_check_join(issue, server_ip)}")
+            print(f"join {ftp_check_join(issue, server_ip)}")
             ftp_get_file(server_ip, issue, issue_id)
             qm2 = encode_files_qm2(issue, issue_id)
             insert_upload(qm2)
