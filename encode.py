@@ -146,6 +146,7 @@ def encode_files(file_to_encode):
     file_qm2 = config_data['out_dir'] + "/" + file_to_encode.replace('.mp4', '_qm2.mp4')
     file_sd2 = config_data['out_dir'] + "/" + file_to_encode.replace('.mp4', '_sd2.mp4')
     file_fhd = config_data['out_dir'] + "/" + file_to_encode.replace('.mp4', '_fhd.mp4')
+
     if verbose:
         ffmpeg_bin = config_data['ffmpeg_bin']
     else:
@@ -197,7 +198,7 @@ for server_ip, issue_arr in ftp_check().items():
         if issue_status:
             print(server_ip, issue, issue_id)
             # print(f"join {ftp_check_join(issue, server_ip)}")
-            # ftp_get_file(server_ip, issue, issue_id)
+            ftp_get_file(server_ip, issue, issue_id)
             # ftp_remove_files(issue, server_ip)
             qm2, sd2, fhd = encode_files(issue)
             print(qm2, sd2, fhd)
