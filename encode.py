@@ -117,6 +117,7 @@ def ftp_remove_log(file_to_get, ftp_server):
         if file_to_get in name:
             print(ftp_path + name)
             session.delete(ftp_path + name)
+    session.delete(ftp_check_join(file_to_get, ftp_server))
     session.close()
 
 
@@ -136,6 +137,10 @@ def ftp_check_join(file_to_get, ftp_server):
         return file_to_get.replace('.mp4', ' - Join.mp4')
     else:
         return None
+
+
+def encode_files(file_to_encode):
+    print(file_to_encode)
 
 
 #############
@@ -168,6 +173,6 @@ for server_ip, issue_arr in ftp_check().items():
             # print(server_ip, issue, issue_id)
             print(f"join {ftp_check_join(issue, server_ip)}")
             ftp_get_file(server_ip, issue, issue_id)
-            # ftp_remove_log(issue, server_ip)
+            ftp_remove_log(issue, server_ip)
 
 os.remove(pid_file)
