@@ -190,7 +190,7 @@ def encode_files_sd2(file_to_encode, issue_id_local):
 
 def encode_files_fhd(file_to_encode, issue_id_local):
     input_file = config_data['tmp_dir'] + "/" + file_to_encode
-    file_fhd = config_data['out_dir'] + "/" + file_to_encode.replace('.mp4', '_qm2.mp4')
+    file_fhd = config_data['out_dir'] + "/" + file_to_encode.replace('.mp4', '_fhd.mp4')
 
     if verbose:
         ffmpeg_bin = config_data['ffmpeg_bin']
@@ -214,6 +214,7 @@ def encode_files_fhd(file_to_encode, issue_id_local):
 def insert_upload(file_to_register):
     ip = requests.get('https://checkip.amazonaws.com').text.strip()
     split_file_name = file_to_register.split("_")
+    quality_suffix = split_file_name[3].split(".")
     vod_conn = mysql.connector.connect(
         host=config_data['mysql_host'],
         user=config_data['mysql_user'],
@@ -221,7 +222,7 @@ def insert_upload(file_to_register):
         database=config_data['mysql_db']
     )
     sql = "INSERT INTO upload_mp4(enc_ip, mtag, issue_name, quality) VALUES(%s, %s, %s, %s)"
-    val = (ip, split_file_name[0], file_to_register, "ready_for_cut")
+    val = (ip, split_file_name[0], file_to_register, quality_suffix[0])
     print(val)
 
 
