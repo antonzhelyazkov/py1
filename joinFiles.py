@@ -156,7 +156,7 @@ for media in config_data['media']:
         expected_start = int(item['start']) - int(config_data['seconds_before_start'])
         expected_end = int(item['end']) + int(config_data['seconds_after_end'])
         issue_name = media + "_" + item['name'] + "_" + datetime.fromtimestamp(int(item['start'])).strftime(
-            "%d-%m-%Y_%H-%M-%S")
+            "%d-%m-%Y_%H-%M")
         if expected_end < currentTS and item['processed'] == 'false':
             dst_dir = dst_root + "/" + issue_name
             if os.path.exists(dst_dir):
