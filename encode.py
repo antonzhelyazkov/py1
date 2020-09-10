@@ -12,7 +12,7 @@ config_file = "./config.json"
 argv = sys.argv[1:]
 
 try:
-    opts, argv = getopt.getopt(argv, "c:", ["config="])
+    opts, argv = getopt.getopt(argv, "c:v", ["config=", "verbose"])
 except getopt.GetoptError as err:
     print(err)
     opts = []
@@ -20,6 +20,8 @@ except getopt.GetoptError as err:
 for opt, arg in opts:
     if opt in ['-c', '--config']:
         config_file = arg
+    if opt in ['-v', '--verbose']:
+        verbose = True
     else:
         print("HELP")
 
@@ -144,19 +146,23 @@ def encode_files(file_to_encode):
     file_qm2 = config_data['out_dir'] + "/" + file_to_encode.replace('.mp4', '_qm2.mp4')
     file_sd2 = config_data['out_dir'] + "/" + file_to_encode.replace('.mp4', '_sd2.mp4')
     file_fhd = config_data['out_dir'] + "/" + file_to_encode.replace('.mp4', '_fhd.mp4')
+    if verbose:
+        ffmpeg_bin = config_data['ffmpeg_bin'] + " -hide_banner -loglevel quiet"
+    else:
+        ffmpeg_bin = config_data['ffmpeg_bin']
 
-    ffmpeg_command = "ffmpeg -hide_banner -loglevel quiet -hwaccel cuvid -deint 1 -vsync 1 -drop_second_field 1 " \
-                 "-c:v h264_cuvid -i {} " \
-                 "-c:v h264_nvenc -filter:v scale_npp=w=1920:h=1080 -profile:v high -g:v 80 -b:v 3500000 " \
-                 "-maxrate:v 3700000 -bufsize:v 3700000 -preset:v slow -c:a libfdk_aac -b:a 128000 -ac 2 -ar 48k " \
-                 "-f mp4 {} " \
-                 "-c:v h264_nvenc -filter:v scale_npp=w=854:h=480 -profile:v high -g:v 80 -b:v 1500000 " \
-                 "-maxrate:v 2000000 -bufsize:v 2000000 -preset:v slow -c:a libfdk_aac -b:a 96000 -ac 2 -ar 48k " \
-                 "-f mp4 {} " \
-                 "-c:v h264_nvenc -filter:v scale_npp=w=640:h=360 -profile:v high -g:v 80 -b:v 600000 " \
-                 "-maxrate:v 1000000 -bufsize:v 1000000 -preset:v slow -c:a libfdk_aac -b:a 48000 -ac 2 -ar 48k " \
-                 "-f mp4 {}"\
-        .format(input_file, file_fhd, file_sd2, file_qm2)
+    ffmpeg_command = "{} -y -hwaccel cuvid -deint 1 -vsync 1 -drop_second_field 1 " \
+                     "-c:v h264_cuvid -i {} " \
+                     "-c:v h264_nvenc -filter:v scale_npp=w=1920:h=1080 -profile:v high -g:v 80 -b:v 3500000 " \
+                     "-maxrate:v 3700000 -bufsize:v 3700000 -preset:v slow -c:a libfdk_aac -b:a 128000 -ac 2 -ar 48k " \
+                     "-f mp4 {} " \
+                     "-c:v h264_nvenc -filter:v scale_npp=w=854:h=480 -profile:v high -g:v 80 -b:v 1500000 " \
+                     "-maxrate:v 2000000 -bufsize:v 2000000 -preset:v slow -c:a libfdk_aac -b:a 96000 -ac 2 -ar 48k " \
+                     "-f mp4 {} " \
+                     "-c:v h264_nvenc -filter:v scale_npp=w=640:h=360 -profile:v high -g:v 80 -b:v 600000 " \
+                     "-maxrate:v 1000000 -bufsize:v 1000000 -preset:v slow -c:a libfdk_aac -b:a 48000 -ac 2 -ar 48k " \
+                     "-f mp4 {}" \
+        .format(ffmpeg_bin, input_file, file_fhd, file_sd2, file_qm2)
 
     os.system(ffmpeg_command)
     return os.path.basename(file_qm2), os.path.basename(file_sd2), os.path.basename(file_fhd)
