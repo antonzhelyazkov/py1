@@ -140,8 +140,26 @@ def ftp_check_join(file_to_get, ftp_server):
 
 
 def encode_files(file_to_encode):
-    file_path = config_data['tmp_dir'] + "/" + file_to_encode
-    print(file_path)
+    input_file = config_data['tmp_dir'] + "/" + file_to_encode
+    file_qm2 = config_data['out_dir'] + "/" + file_to_encode.replace('.mp4', '_qm2.mp4')
+    file_sd2 = config_data['out_dir'] + "/" + file_to_encode.replace('.mp4', '_sd2.mp4')
+    file_fhd = config_data['out_dir'] + "/" + file_to_encode.replace('.mp4', '_fhd.mp4')
+
+    ffmpeg_command = "ffmpeg -hide_banner -loglevel quiet -hwaccel cuvid -deint 1 -vsync 1 -drop_second_field 1 " \
+                 "-c:v h264_cuvid -i {} " \
+                 "-c:v h264_nvenc -filter:v scale_npp=w=1920:h=1080 -profile:v high -g:v 80 -b:v 3500000 " \
+                 "-maxrate:v 3700000 -bufsize:v 3700000 -preset:v slow -c:a libfdk_aac -b:a 128000 -ac 2 -ar 48k " \
+                 "-f mp4 {} " \
+                 "-c:v h264_nvenc -filter:v scale_npp=w=854:h=480 -profile:v high -g:v 80 -b:v 1500000 " \
+                 "-maxrate:v 2000000 -bufsize:v 2000000 -preset:v slow -c:a libfdk_aac -b:a 96000 -ac 2 -ar 48k " \
+                 "-f mp4 {} " \
+                 "-c:v h264_nvenc -filter:v scale_npp=w=640:h=360 -profile:v high -g:v 80 -b:v 600000 " \
+                 "-maxrate:v 1000000 -bufsize:v 1000000 -preset:v slow -c:a libfdk_aac -b:a 48000 -ac 2 -ar 48k " \
+                 "-f mp4 {}"\
+        .format(input_file, file_fhd, file_sd2, file_qm2)
+
+    os.system(ffmpeg_command)
+    return os.path.basename(file_qm2), os.path.basename(file_sd2), os.path.basename(file_fhd)
 
 
 #############
@@ -167,13 +185,14 @@ else:
 for server_ip, issue_arr in ftp_check().items():
     print(server_ip, issue_arr)
     for issue in issue_arr:
-        print(issue)
+        # print(issue)
         issue_status, issue_id = check_status(issue)
-        print(issue_status, issue_id)
+        # print(issue_status, issue_id)
         if issue_status:
-            # print(server_ip, issue, issue_id)
-            print(f"join {ftp_check_join(issue, server_ip)}")
-            ftp_get_file(server_ip, issue, issue_id)
-            ftp_remove_files(issue, server_ip)
-            encode_files(issue)
+            print(server_ip, issue, issue_id)
+            # print(f"join {ftp_check_join(issue, server_ip)}")
+            # ftp_get_file(server_ip, issue, issue_id)
+            # ftp_remove_files(issue, server_ip)
+            qm2, sd2, fhd = encode_files(issue)
+            print(qm2, sd2, fhd)
 os.remove(pid_file)
