@@ -147,9 +147,9 @@ def encode_files(file_to_encode):
     file_sd2 = config_data['out_dir'] + "/" + file_to_encode.replace('.mp4', '_sd2.mp4')
     file_fhd = config_data['out_dir'] + "/" + file_to_encode.replace('.mp4', '_fhd.mp4')
     if verbose:
-        ffmpeg_bin = config_data['ffmpeg_bin'] + " -hide_banner -loglevel quiet"
-    else:
         ffmpeg_bin = config_data['ffmpeg_bin']
+    else:
+        ffmpeg_bin = config_data['ffmpeg_bin'] + " -hide_banner -loglevel quiet"
 
     ffmpeg_command = "{} -y -hwaccel cuvid -deint 1 -vsync 1 -drop_second_field 1 " \
                      "-c:v h264_cuvid -i {} " \
