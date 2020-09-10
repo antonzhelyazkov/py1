@@ -61,6 +61,7 @@ def update_status(issue_id_local, status):
 
 
 def check_status(file_to_check):
+    print(file_to_check)
     vod_conn = mysql.connector.connect(
         host=config_data['mysql_host'],
         user=config_data['mysql_user'],
