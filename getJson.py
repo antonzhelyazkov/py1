@@ -13,7 +13,7 @@ import time
 import getopt
 
 
-currentDate = datetime.today().strftime('%Y-%m-%d')
+currentDate = datetime.today().strftime('%d-%m-%Y')
 config_file = "./config.json"
 
 argv = sys.argv[1:]
