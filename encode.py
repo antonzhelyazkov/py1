@@ -141,7 +141,7 @@ def ftp_check_join(file_to_get, ftp_server):
         return None
 
 
-def encode_files(file_to_encode):
+def encode_files(file_to_encode, issue_id_local):
     input_file = config_data['tmp_dir'] + "/" + file_to_encode
     file_qm2 = config_data['out_dir'] + "/" + file_to_encode.replace('.mp4', '_qm2.mp4')
     file_sd2 = config_data['out_dir'] + "/" + file_to_encode.replace('.mp4', '_sd2.mp4')
@@ -165,7 +165,10 @@ def encode_files(file_to_encode):
                      "-f mp4 {}" \
         .format(ffmpeg_bin, input_file, file_fhd, file_sd2, file_qm2)
 
+    update_status(issue_id_local, "encoding_started")
     os.system(ffmpeg_command)
+    update_status(issue_id_local, "encoding_finished")
+
     return os.path.basename(file_qm2), os.path.basename(file_sd2), os.path.basename(file_fhd)
 
 
@@ -200,6 +203,6 @@ for server_ip, issue_arr in ftp_check().items():
             # print(f"join {ftp_check_join(issue, server_ip)}")
             ftp_get_file(server_ip, issue, issue_id)
             # ftp_remove_files(issue, server_ip)
-            qm2, sd2, fhd = encode_files(issue)
+            qm2, sd2, fhd = encode_files(issue, issue_id)
             print(qm2, sd2, fhd)
 os.remove(pid_file)
