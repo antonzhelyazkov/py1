@@ -140,7 +140,7 @@ def ftp_check_join(file_to_get, ftp_server):
 
 
 def encode_files(file_to_encode):
-    file_path = config_data['dst_dir'] + "/" + file_to_encode
+    file_path = config_data['tmp_dir'] + "/" + file_to_encode
     print(file_path)
 
 
