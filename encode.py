@@ -98,7 +98,7 @@ def ftp_check():
 
 
 def ftp_get_file(ftp_server, file_to_get, issue_id_local):
-    local_mp4 = open(config_data['dst_dir'] + file_to_get, 'wb')
+    local_mp4 = open(config_data['dst_dir'] + "/" + file_to_get, 'wb')
     remote_mp4 = ftp_check_join(file_to_get, ftp_server)
     session = ftplib.FTP(ftp_server)
     session.login(user=config_data['out_ftp_user'], passwd=config_data['out_ftp_pass'])
@@ -167,9 +167,9 @@ else:
 for server_ip, issue_arr in ftp_check().items():
     print(server_ip, issue_arr)
     for issue in issue_arr:
-        # print(issue)
+        print(issue)
         issue_status, issue_id = check_status(issue)
-        # print(issue_status, issue_id)
+        print(issue_status, issue_id)
         if issue_status:
             # print(server_ip, issue, issue_id)
             print(f"join {ftp_check_join(issue, server_ip)}")
