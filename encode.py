@@ -85,7 +85,7 @@ def ftp_check():
         session.login(user=config_data['out_ftp_user'], passwd=config_data['out_ftp_pass'])
 
         for name, facts in session.mlsd(ftp_path):
-            filename = 'd:/' + name
+            filename = config_data['dst_dir'] + name
             localfile = open(filename, 'wb')
             session.retrbinary('RETR ' + ftp_path + name, localfile.write, 1024)
             localfile.close()
@@ -98,7 +98,7 @@ def ftp_check():
 
 
 def ftp_get_file(ftp_server, file_to_get, issue_id_local):
-    local_mp4 = open("d:/" + file_to_get, 'wb')
+    local_mp4 = open(config_data['dst_dir'] + file_to_get, 'wb')
     session = ftplib.FTP(ftp_server)
     session.login(user=config_data['out_ftp_user'], passwd=config_data['out_ftp_pass'])
     update_status(issue_id_local, "download_started")
