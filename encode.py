@@ -6,6 +6,7 @@ import sys
 import re
 
 import mysql.connector
+import requests
 
 config_file = "./config.json"
 
@@ -158,7 +159,7 @@ def encode_files_qm2(file_to_encode, issue_id_local):
         .format(ffmpeg_bin, input_file, file_qm2)
 
     update_status(issue_id_local, "encoding_qm2_started")
-    os.system(ffmpeg_command)
+    # os.system(ffmpeg_command)
     update_status(issue_id_local, "encoding_qm2_finished")
 
     return os.path.basename(file_qm2)
@@ -181,7 +182,7 @@ def encode_files_sd2(file_to_encode, issue_id_local):
         .format(ffmpeg_bin, input_file, file_sd2)
 
     update_status(issue_id_local, "encoding_qm2_started")
-    os.system(ffmpeg_command)
+    # os.system(ffmpeg_command)
     update_status(issue_id_local, "encoding_qm2_finished")
 
     return os.path.basename(file_sd2)
@@ -204,10 +205,24 @@ def encode_files_fhd(file_to_encode, issue_id_local):
         .format(ffmpeg_bin, input_file, file_fhd)
 
     update_status(issue_id_local, "encoding_fhd_started")
-    os.system(ffmpeg_command)
+    # os.system(ffmpeg_command)
     update_status(issue_id_local, "encoding_fhd_finished")
 
     return os.path.basename(file_fhd)
+
+
+def insert_upload(file_to_register):
+    ip = requests.get('https://checkip.amazonaws.com').text.strip()
+    split_file_name = file_to_register.split("_")
+    vod_conn = mysql.connector.connect(
+        host=config_data['mysql_host'],
+        user=config_data['mysql_user'],
+        password=config_data['mysql_pass'],
+        database=config_data['mysql_db']
+    )
+    sql = "INSERT INTO upload_mp4(enc_ip, mtag, issue_name, quality) VALUES(%s, %s, %s, %s)"
+    val = (ip, split_file_name[0], file_to_register, "ready_for_cut")
+    print(val)
 
 
 #############
