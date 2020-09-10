@@ -159,7 +159,7 @@ def encode_files_qm2(file_to_encode, issue_id_local):
         .format(ffmpeg_bin, input_file, file_qm2)
 
     update_status(issue_id_local, "encoding_qm2_started")
-    # os.system(ffmpeg_command)
+    os.system(ffmpeg_command)
     update_status(issue_id_local, "encoding_qm2_finished")
 
     return os.path.basename(file_qm2)
@@ -182,7 +182,7 @@ def encode_files_sd2(file_to_encode, issue_id_local):
         .format(ffmpeg_bin, input_file, file_sd2)
 
     update_status(issue_id_local, "encoding_qm2_started")
-    # os.system(ffmpeg_command)
+    os.system(ffmpeg_command)
     update_status(issue_id_local, "encoding_qm2_finished")
 
     return os.path.basename(file_sd2)
@@ -205,7 +205,7 @@ def encode_files_fhd(file_to_encode, issue_id_local):
         .format(ffmpeg_bin, input_file, file_fhd)
 
     update_status(issue_id_local, "encoding_fhd_started")
-    # os.system(ffmpeg_command)
+    os.system(ffmpeg_command)
     update_status(issue_id_local, "encoding_fhd_finished")
 
     return os.path.basename(file_fhd)
@@ -223,7 +223,10 @@ def insert_upload(file_to_register):
     )
     sql = "INSERT INTO upload_mp4(enc_ip, mtag, issue_name, quality) VALUES(%s, %s, %s, %s)"
     val = (ip, split_file_name[0], file_to_register, quality_suffix[0])
-    print(val)
+    curs = vod_conn.cursor()
+    curs.execute(sql, val)
+    vod_conn.commit()
+    vod_conn.close()
 
 
 #############
@@ -261,7 +264,7 @@ for server_ip, issue_arr in ftp_check().items():
             insert_upload(qm2)
             sd2 = encode_files_sd2(issue, issue_id)
             insert_upload(sd2)
-            fhd = encode_files_fhd(issue, issue_id)
-            insert_upload(fhd)
+            # fhd = encode_files_fhd(issue, issue_id)
+            # insert_upload(fhd)
             print(qm2, sd2, fhd)
 os.remove(pid_file)
