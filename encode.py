@@ -146,22 +146,20 @@ def ftp_check_log_dir(ftp_server, directory):
 
     session = ftplib.FTP(ftp_server)
     session.login(user=config_data['out_ftp_user'], passwd=config_data['out_ftp_pass'])
+    dirs_arr = []
 
     for name, facts in session.mlsd():
-        dirs_arr = []
         if facts['type'] == "dir":
             print(f"check {name}")
             dirs_arr.append(name)
-        else:
-            continue
 
-        print(f"DIRS {dirs_arr}")
+    print(f"DIRS {dirs_arr}")
+    if directory in dirs_arr:
+        print(f"directory {directory} found")
+    else:
+        print(f"directory {directory} NOT found")
+        session.mkd(directory)
 
-        if directory in dirs_arr:
-            print(f"directory {directory} found")
-        else:
-            print(f"directory {directory} NOT found")
-            session.mkd(directory)
     session.close()
 
 
@@ -338,17 +336,17 @@ for server_ip, issue_arr in ftp_check().items():
         if issue_status:
             print(server_ip, issue, issue_id)
             print(f"join {ftp_check_join(issue, server_ip)}")
-            update_encoder_ip(issue_id)
-            ftp_get_file(server_ip, issue, issue_id)
-            qm2 = encode_files_qm2(issue, issue_id)
-            insert_upload(qm2)
-            ts = encode_files_ts(issue, issue_id)
-            insert_upload_ts(ts)
-            sd2 = encode_files_sd2(issue, issue_id)
-            insert_upload(sd2)
-            fhd = encode_files_fhd(issue, issue_id)
-            insert_upload(fhd)
-            ftp_remove_files(issue, server_ip)
-            update_status(issue_id, "done")
-            print(qm2, sd2, fhd)
+            #update_encoder_ip(issue_id)
+            #ftp_get_file(server_ip, issue, issue_id)
+            #qm2 = encode_files_qm2(issue, issue_id)
+            #insert_upload(qm2)
+            #ts = encode_files_ts(issue, issue_id)
+            #insert_upload_ts(ts)
+            #sd2 = encode_files_sd2(issue, issue_id)
+            #insert_upload(sd2)
+            #fhd = encode_files_fhd(issue, issue_id)
+            #insert_upload(fhd)
+            #ftp_remove_files(issue, server_ip)
+            #update_status(issue_id, "done")
+            #print(qm2, sd2, fhd)
 os.remove(pid_file)
