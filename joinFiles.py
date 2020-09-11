@@ -42,9 +42,12 @@ def create_chlist(start_time, end_time, chunk_list, media_name):
     ts_arr.sort()
 
     for ts_item in ts_arr:
-        fh = open(chunk_list, "a")
-        fh.write("file '" + path_chunks + "/" + ts_item + "'\n")
-        fh.close()
+        chunk_name = media_name + "_" + ts_item + ".mp4"
+        path_chunk_name = path_chunks + "/" + chunk_name
+        if os.path.isfile(path_chunk_name):
+            fh = open(chunk_list, "a")
+            fh.write("file '" + path_chunks + "/" + chunk_name + "'\n")
+            fh.close()
 
 
 def join_files(chunk_list, dst_file):
