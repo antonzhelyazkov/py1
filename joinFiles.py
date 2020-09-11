@@ -30,17 +30,20 @@ currentTS = int(time.time())
 
 
 def create_chlist(start_time, end_time, chunk_list, media_name):
+    ts_arr = []
     chunks = os.listdir(path_chunks)
     for chunk in chunks:
         if chunk.endswith(config_data['chunk_extension']):
             ts_chunk = chunk.replace(config_data['chunk_extension'], '')
             ts_chunk = ts_chunk.replace(media_name + '_', '')
             if end_time >= int(ts_chunk) >= start_time:
-                print(chunk, ts_chunk)
+                ts_arr.append(ts_chunk)
+#                print(chunk, ts_chunk)
 
-                fh = open(chunk_list, "a")
-                fh.write("file '" + path_chunks + "/" + chunk + "'\n")
-                fh.close()
+    print(ts_arr)
+#                fh = open(chunk_list, "a")
+#                fh.write("file '" + path_chunks + "/" + chunk + "'\n")
+#                fh.close()
 
 
 def join_files(chunk_list, dst_file):
