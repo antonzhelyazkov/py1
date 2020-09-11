@@ -40,7 +40,8 @@ def create_chlist(start_time, end_time, chunk_list, media_name):
                 ts_arr.append(ts_chunk)
 #                print(chunk, ts_chunk)
 
-    print(ts_arr.sort())
+    ts_arr.sort()
+    print(ts_arr)
 #                fh = open(chunk_list, "a")
 #                fh.write("file '" + path_chunks + "/" + chunk + "'\n")
 #                fh.close()
