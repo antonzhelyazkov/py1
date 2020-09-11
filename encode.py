@@ -61,6 +61,21 @@ def update_status(issue_id_local, status):
     vod_conn.close()
 
 
+def update_encoder_ip(issue_id_local):
+    vod_conn = mysql.connector.connect(
+        host=config_data['mysql_host'],
+        user=config_data['mysql_user'],
+        password=config_data['mysql_pass'],
+        database=config_data['mysql_db']
+    )
+    sql = "update video_prod set encoder = %s where id = %s"
+    val = (local_ip, issue_id_local)
+    update = vod_conn.cursor()
+    update.execute(sql, val)
+    vod_conn.commit()
+    vod_conn.close()
+
+
 def check_status(file_to_check):
     vod_conn = mysql.connector.connect(
         host=config_data['mysql_host'],
@@ -298,6 +313,7 @@ for server_ip, issue_arr in ftp_check().items():
         if issue_status:
             print(server_ip, issue, issue_id)
             print(f"join {ftp_check_join(issue, server_ip)}")
+            update_encoder_ip(issue_id)
             ftp_get_file(server_ip, issue, issue_id)
             qm2 = encode_files_qm2(issue, issue_id)
             insert_upload(qm2)
