@@ -37,6 +37,7 @@ def create_chlist(start_time, end_time, chunk_list, media_name):
             ts_chunk = ts_chunk.replace(media_name + '_', '')
             if end_time >= int(ts_chunk) >= start_time:
                 print(chunk)
+
                 fh = open(chunk_list, "a")
                 fh.write("file '" + path_chunks + "/" + chunk + "'\n")
                 fh.close()
