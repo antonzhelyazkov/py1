@@ -96,18 +96,20 @@ def check_status(file_to_check):
 
 
 def ftp_check():
-    ftp_path = "log/"
+    ftp_path = "log"
     ftp_map = {}
+
     for ftp_server in config_data['ftp_hosts']:
+        ftp_check_log_dir(ftp_server, ftp_path)
         tmp_arr = []
         session = ftplib.FTP(ftp_server)
         session.login(user=config_data['out_ftp_user'], passwd=config_data['out_ftp_pass'])
 
         for name, facts in session.mlsd(ftp_path):
             filename = config_data['dst_dir'] + name
-            localfile = open(filename, 'wb')
-            session.retrbinary('RETR ' + ftp_path + name, localfile.write, 1024)
-            localfile.close()
+            local_file = open(filename, 'wb')
+            session.retrbinary('RETR ' + ftp_path + name, local_file.write, 1024)
+            local_file.close()
             if parse_log_file(filename):
                 tmp_arr.append(logfile_to_name(name))
             os.remove(filename)
@@ -137,6 +139,24 @@ def ftp_remove_files(file_to_get, ftp_server):
             print(ftp_path + name)
             session.delete(ftp_path + name)
     session.delete(ftp_check_join(file_to_get, ftp_server))
+    session.close()
+
+
+def ftp_check_log_dir(ftp_server, directory):
+    print('ftp_check_log_dir')
+
+    session = ftplib.FTP(ftp_server)
+    session.login(user=config_data['out_ftp_user'], passwd=config_data['out_ftp_pass'])
+
+    for name, facts in session.mlsd():
+        dirs_arr = []
+        if facts['type'] == "dir":
+            dirs_arr.append(name)
+        if directory in dirs_arr:
+            print(f"directory {directory} fond")
+        else:
+            print(f"directory {directory} NOT fond")
+            session.mkd(directory)
     session.close()
 
 
