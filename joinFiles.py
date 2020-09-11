@@ -40,7 +40,7 @@ def create_chlist(start_time, end_time, chunk_list, media_name):
                 ts_arr.append(ts_chunk)
 #                print(chunk, ts_chunk)
 
-    ts_arr.sort()
+#    ts_arr.sort()
 
     for ts_item in ts_arr():
         print(ts_item)
