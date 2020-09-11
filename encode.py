@@ -9,6 +9,7 @@ import mysql.connector
 import requests
 
 config_file = "./config.json"
+local_ip = requests.get('https://checkip.amazonaws.com').text.strip()
 
 argv = sys.argv[1:]
 
@@ -165,6 +166,29 @@ def encode_files_qm2(file_to_encode, issue_id_local):
     return os.path.basename(file_qm2)
 
 
+def encode_files_ts(file_to_encode, issue_id_local):
+    input_file = config_data['tmp_dir'] + "/" + file_to_encode
+    file_ts = config_data['out_dir'] + "/" + file_to_encode.replace('.mp4', '_sd2.ts')
+
+    if verbose:
+        ffmpeg_bin = config_data['ffmpeg_bin']
+    else:
+        ffmpeg_bin = config_data['ffmpeg_bin'] + " -hide_banner -loglevel quiet"
+
+    ffmpeg_command = "{} -y -hwaccel cuvid -deint 1 -vsync 1 -drop_second_field 1 " \
+                     "-c:v h264_cuvid -i {} " \
+                     "-c:v h264_nvenc -filter:v scale_npp=w=854:h=480 -profile:v high -g:v 80 -b:v 1600000 " \
+                     "-maxrate:v 2000000 -bufsize:v 2000000 -preset:v slow -c:a libfdk_aac -b:a 96000 -ac 2 -ar 48k " \
+                     "-f mpegts {}" \
+        .format(ffmpeg_bin, input_file, file_ts)
+
+    update_status(issue_id_local, "encoding_ts_started")
+    os.system(ffmpeg_command)
+    update_status(issue_id_local, "encoding_ts_finished")
+
+    return os.path.basename(file_ts)
+
+
 def encode_files_sd2(file_to_encode, issue_id_local):
     input_file = config_data['tmp_dir'] + "/" + file_to_encode
     file_sd2 = config_data['out_dir'] + "/" + file_to_encode.replace('.mp4', '_sd2.mp4')
@@ -181,9 +205,9 @@ def encode_files_sd2(file_to_encode, issue_id_local):
                      "-f mp4 {}" \
         .format(ffmpeg_bin, input_file, file_sd2)
 
-    update_status(issue_id_local, "encoding_qm2_started")
+    update_status(issue_id_local, "encoding_sd2_started")
     os.system(ffmpeg_command)
-    update_status(issue_id_local, "encoding_qm2_finished")
+    update_status(issue_id_local, "encoding_sd2_finished")
 
     return os.path.basename(file_sd2)
 
@@ -212,7 +236,6 @@ def encode_files_fhd(file_to_encode, issue_id_local):
 
 
 def insert_upload(file_to_register):
-    ip = requests.get('https://checkip.amazonaws.com').text.strip()
     split_file_name = file_to_register.split("_")
     quality_suffix = split_file_name[4].split(".")
     vod_conn = mysql.connector.connect(
@@ -222,7 +245,24 @@ def insert_upload(file_to_register):
         database=config_data['mysql_db']
     )
     sql = "INSERT INTO upload_mp4(enc_ip, mtag, issue_name, quality) VALUES(%s, %s, %s, %s)"
-    val = (ip, split_file_name[0], file_to_register, quality_suffix[0])
+    val = (local_ip, split_file_name[0], file_to_register, quality_suffix[0])
+    curs = vod_conn.cursor()
+    curs.execute(sql, val)
+    vod_conn.commit()
+    vod_conn.close()
+
+
+def insert_upload_ts(file_to_register):
+    split_file_name = file_to_register.split("_")
+    quality_suffix = split_file_name[4].split(".")
+    vod_conn = mysql.connector.connect(
+        host=config_data['mysql_host'],
+        user=config_data['mysql_user'],
+        password=config_data['mysql_pass'],
+        database=config_data['mysql_db']
+    )
+    sql = "INSERT INTO upload_ts(enc_ip, mtag, issue_name, quality) VALUES(%s, %s, %s, %s)"
+    val = (local_ip, split_file_name[0], file_to_register, quality_suffix[0])
     curs = vod_conn.cursor()
     curs.execute(sql, val)
     vod_conn.commit()
@@ -261,10 +301,13 @@ for server_ip, issue_arr in ftp_check().items():
             ftp_get_file(server_ip, issue, issue_id)
             qm2 = encode_files_qm2(issue, issue_id)
             insert_upload(qm2)
+            ts = encode_files_ts(issue, issue_id)
+            insert_upload_ts(ts)
             sd2 = encode_files_sd2(issue, issue_id)
             insert_upload(sd2)
             fhd = encode_files_fhd(issue, issue_id)
             insert_upload(fhd)
             ftp_remove_files(issue, server_ip)
+            update_status(issue_id, "done")
             print(qm2, sd2, fhd)
 os.remove(pid_file)
