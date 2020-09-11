@@ -8,8 +8,10 @@ import shutil
 import ffmpeg
 import ftplib
 import mysql.connector
+import requests
 
 config_file = "./config.json"
+local_ip = requests.get('https://checkip.amazonaws.com').text.strip()
 
 argv = sys.argv[1:]
 
@@ -80,8 +82,8 @@ def insert_mysql(media_name, issue):
         database=config_data['mysql_db']
     )
 
-    sql = "INSERT INTO video_prod (media_tag, issue_name, ts_file_name, status) VALUES (%s, %s, %s, %s)"
-    val = (media_name, issue, issue + '.mp4', "ready_for_cut")
+    sql = "INSERT INTO video_prod (media_tag, issue_name, ts_file_name, status, encoder) VALUES (%s, %s, %s, %s, %s)"
+    val = (media_name, issue, issue + '.mp4', "ready_for_cut", local_ip)
     curs = vod_conn.cursor()
     curs.execute(sql, val)
     vod_conn.commit()
