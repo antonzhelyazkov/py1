@@ -8,7 +8,6 @@ import shutil
 import ffmpeg
 import ftplib
 import mysql.connector
-import requests
 
 config_file = "./config.json"
 
@@ -39,6 +38,7 @@ def create_chlist(start_time, end_time, chunk_list, media_name):
                 ts_arr.append(int(ts_chunk))
 
     ts_arr.sort()
+    print(ts_arr)
 
     for ts_item in ts_arr:
         chunk_name = str(ts_item) + ".mp4"
