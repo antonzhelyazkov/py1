@@ -32,14 +32,12 @@ def create_chlist(start_time, end_time, chunk_list, media_name):
     ts_arr = []
     chunks = os.listdir(path_chunks)
     for chunk in chunks:
-        print(chunk)
         if chunk.endswith(config_data['chunk_extension']):
             ts_chunk = chunk.replace(config_data['chunk_extension'], '')
             if end_time >= int(ts_chunk) >= start_time:
                 ts_arr.append(int(ts_chunk))
 
     ts_arr.sort()
-    print(ts_arr)
 
     for ts_item in ts_arr:
         chunk_name = str(ts_item) + ".mp4"
