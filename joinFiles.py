@@ -35,14 +35,13 @@ def create_chlist(start_time, end_time, chunk_list, media_name):
     for chunk in chunks:
         if chunk.endswith(config_data['chunk_extension']):
             ts_chunk = chunk.replace(config_data['chunk_extension'], '')
-            ts_chunk = ts_chunk.replace(media_name + '_', '')
             if end_time >= int(ts_chunk) >= start_time:
-                ts_arr.append(ts_chunk)
+                ts_arr.append(int(ts_chunk))
 
     ts_arr.sort()
 
     for ts_item in ts_arr:
-        chunk_name = media_name + "_" + ts_item + ".mp4"
+        chunk_name = str(ts_item) + ".mp4"
         path_chunk_name = path_chunks + "/" + chunk_name
         if os.path.isfile(path_chunk_name):
             fh = open(chunk_list, "a")
@@ -176,10 +175,10 @@ for media in config_data['media']:
             else:
                 os.makedirs(dst_dir)
             chunk_list_file = dst_dir + "/chunks.txt"
-            ffmpeg_output_file = dst_dir + "/output.txt"
+#            ffmpeg_output_file = dst_dir + "/output.txt"
             destination_file = dst_dir + "/" + issue_name + ".mp4"
             create_chlist(expected_start, expected_end, chunk_list_file, media)
-            print(f"cp {chunk_list_file} {debug_file}")
+#            print(f"cp {chunk_list_file} {debug_file}")
             shutil.copyfile(chunk_list_file, debug_file)
             join_files(chunk_list_file, destination_file)
             if check_duration(destination_file, expected_start, expected_end):
