@@ -199,8 +199,10 @@ for media in config_data['media']:
                 json_file.close()
                 shutil.rmtree(dst_dir)
         elif expected_end < currentTS and item['processed'] == 'true':
-            print(issue_name, "Already Done", time.ctime(expected_start), time.ctime(expected_end))
+            print(f"DONE {issue_name}, {time.ctime(expected_start)} {time.ctime(expected_end)}")
+        elif item['processed'] == 'err':
+            print(f"ERR {issue_name}, {time.ctime(expected_start)} {time.ctime(expected_end)}")
         else:
-            print(issue_name, "Not ready", time.ctime(expected_start), time.ctime(expected_end))
+            print(f"Not READY {issue_name}, {time.ctime(expected_start)} {time.ctime(expected_end)}")
 
 os.remove(pid_file)
