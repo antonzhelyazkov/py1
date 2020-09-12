@@ -32,6 +32,7 @@ def create_chlist(start_time, end_time, chunk_list, media_name):
     ts_arr = []
     chunks = os.listdir(path_chunks)
     for chunk in chunks:
+        print(chunk)
         if chunk.endswith(config_data['chunk_extension']):
             ts_chunk = chunk.replace(config_data['chunk_extension'], '')
             if end_time >= int(ts_chunk) >= start_time:
