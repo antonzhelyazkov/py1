@@ -35,7 +35,7 @@ else:
     log_level = logging.INFO
 
 logging.basicConfig(filename=log_file, level=log_level, format='%(asctime)s:%(levelname)s:%(message)s',
-                    datefmt="%Y-%m-%d %H-%m-%S")
+                    datefmt="%Y-%m-%d %H-%M-%S")
 
 logging.debug("qweqweqwe")
 logging.info("asdasdasd")
