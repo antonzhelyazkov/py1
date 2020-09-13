@@ -24,7 +24,7 @@ config_open = open(config_file, encoding='utf-8')
 config_data = json.load(config_open)
 
 file_name = os.path.basename(sys.argv[0]).split(".")
-print(type(file_name))
+print(file_name)
 log_file = config_data['log_dir'] + "/" + file_name + ".log"
 
 print(log_file)
