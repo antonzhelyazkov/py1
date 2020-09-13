@@ -5,6 +5,7 @@ import getopt
 import logging
 
 config_file = "./config.json"
+verbose = False
 
 argv = sys.argv[1:]
 
@@ -28,11 +29,11 @@ config_data = json.load(config_open)
 file_name = os.path.basename(sys.argv[0]).split(".")
 log_file = config_data['log_dir'] + "/" + file_name[0] + ".log"
 
-#if verbose:
-#    log_level = logging.DEBUG
-#else:
-#    log_level = logging.INFO
+if verbose:
+    log_level = logging.DEBUG
+else:
+    log_level = logging.INFO
 
-logging.basicConfig(filename=log_file, level=logging.DEBUG, format='%(asctime)s:%(levelname)s%(message)s')
+logging.basicConfig(filename=log_file, level=log_level, format='%(asctime)s:%(levelname)s:%(message)s')
 
 logging.debug("qweqweqwe")
