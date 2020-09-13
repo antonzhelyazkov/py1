@@ -1,6 +1,8 @@
 import json
+import os
 import sys
 import getopt
+import logging
 
 config_file = "./config.json"
 
@@ -21,4 +23,6 @@ for opt, arg in opts:
 config_open = open(config_file, encoding='utf-8')
 config_data = json.load(config_open)
 
-print(config_data['log_dir'])
+log_file = config_data['log_dir'] + "/" + os.path.basename(sys.argv[0]).split(".")
+
+print(log_file)
