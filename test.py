@@ -35,4 +35,4 @@ log_file = config_data['log_dir'] + "/" + file_name[0] + ".log"
 
 logging.basicConfig(filename=log_file, level=logging.DEBUG, format='%(asctime)s:%(levelname)s%(message)s')
 
-logging.DEBUG("qweqweqwe")
+logging.debug("qweqweqwe")
