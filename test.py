@@ -28,11 +28,11 @@ config_data = json.load(config_open)
 file_name = os.path.basename(sys.argv[0]).split(".")
 log_file = config_data['log_dir'] + "/" + file_name[0] + ".log"
 
-if verbose:
-    log_level = logging.DEBUG
-else:
-    log_level = logging.INFO
+#if verbose:
+#    log_level = logging.DEBUG
+#else:
+#    log_level = logging.INFO
 
-logging.basicConfig(filename=file_name, level=log_level)
+logging.basicConfig(filename=file_name, level=logging.DEBUG)
 
 logging.DEBUG("qweqweqwe")
