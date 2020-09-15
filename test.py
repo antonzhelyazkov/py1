@@ -48,4 +48,5 @@ file_h.setFormatter(formatter_file)
 logger.addHandler(stream_h)
 logger.addHandler(file_h)
 
-logger.warning("qweqwe")
+for item in config_data['channels']:
+    logger.warning(f"{item} {config_data['channels'][item]}")

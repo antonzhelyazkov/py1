@@ -352,5 +352,6 @@ for server_ip, issue_arr in ftp_check().items():
             insert_upload(fhd)
             ftp_remove_files(issue, server_ip)
             update_status(issue_id, "done")
+            os.remove(issue)
             print(qm2, sd2, fhd)
 os.remove(pid_file)
