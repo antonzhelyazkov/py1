@@ -3,12 +3,9 @@ import os
 import sys
 import getopt
 import logging
-import time
 
 config_file = "./config.json"
 verbose = False
-
-time.sleep(5)
 
 argv = sys.argv[1:]
 
@@ -32,13 +29,23 @@ config_data = json.load(config_open)
 file_name = os.path.basename(sys.argv[0]).split(".")
 log_file = config_data['log_dir'] + "/" + file_name[0] + ".log"
 
+logger = logging.getLogger(__name__)
+# create handlers
+stream_h = logging.StreamHandler()
+file_h = logging.FileHandler(log_file)
+
+stream_h.setLevel(logging.INFO)
+file_h.setLevel(logging.INFO)
+
+formatter_stream = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
+formatter_file = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
 if verbose:
-    log_level = logging.DEBUG
-else:
-    log_level = logging.INFO
+    stream_h.setFormatter(formatter_stream)
 
-logging.basicConfig(filename=log_file, level=log_level, format='%(asctime)s : %(levelname)s : %(message)s',
-                    datefmt="%Y-%m-%d %H-%M-%S")
+file_h.setFormatter(formatter_file)
 
-logging.debug("qweqweqwe")
-logging.info("asdasdasd")
+logger.addHandler(stream_h)
+logger.addHandler(file_h)
+
+logger.warning("qweqwe")
