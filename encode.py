@@ -13,6 +13,7 @@ config_file = "./config.json"
 local_ip = requests.get('https://checkip.amazonaws.com').text.strip()
 
 argv = sys.argv[1:]
+verbose = False
 
 try:
     opts, argv = getopt.getopt(argv, "c:v", ["config=", "verbose"])
