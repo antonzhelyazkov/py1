@@ -328,7 +328,7 @@ else:
     f.write(str(os.getpid()))
     f.close()
 
-time.sleep(config_data['delay'])
+time.sleep(int(config_data['delay']))
 
 for server_ip, issue_arr in ftp_check().items():
     print(server_ip, issue_arr)
