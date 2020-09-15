@@ -4,6 +4,7 @@ import json
 import os
 import sys
 import re
+import time
 
 import mysql.connector
 import requests
@@ -326,6 +327,8 @@ else:
     f = open(pid_file, "w")
     f.write(str(os.getpid()))
     f.close()
+
+time.sleep(config_data['delay'])
 
 for server_ip, issue_arr in ftp_check().items():
     print(server_ip, issue_arr)

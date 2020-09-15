@@ -3,9 +3,12 @@ import os
 import sys
 import getopt
 import logging
+import time
 
 config_file = "./config.json"
 verbose = False
+
+time.sleep(5)
 
 argv = sys.argv[1:]
 
