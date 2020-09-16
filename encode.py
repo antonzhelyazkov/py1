@@ -99,12 +99,14 @@ def check_status(file_to_check):
 
 
 def ftp_check_merged(issue_name, ftp_session, log_dir):
+    return_value = True
     pattern = '\d+of\d+\.mp4'
     issue_string = issue_name.replace('.mp4', '')
     logger.warning(f"check_merged {issue_string}")
     for name, facts in ftp_session.mlsd():
         curr_match = re.search(pattern, name)
         if curr_match:
+            return_value = False
             logger.warning(f"not merged {name} - delete")
             # ftp_session.delete(name)
             for name_log, facts_log in ftp_session.mlsd(log_dir):
@@ -114,6 +116,7 @@ def ftp_check_merged(issue_name, ftp_session, log_dir):
                     ftp_session.delete(log_file_to_delete)
         else:
             logger.warning(f"Correct {name}")
+    return return_value
 
 
 def ftp_check():
@@ -131,8 +134,7 @@ def ftp_check():
             local_file = open(filename, 'wb')
             session.retrbinary('RETR ' + ftp_path + "/" + name, local_file.write, 1024)
             local_file.close()
-            if parse_log_file(filename):
-                ftp_check_merged(logfile_to_name(name), session, ftp_path)
+            if parse_log_file(filename) and ftp_check_merged(logfile_to_name(name), session, ftp_path):
                 tmp_arr.append(logfile_to_name(name))
             os.remove(filename)
         session.close()
