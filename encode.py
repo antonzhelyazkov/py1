@@ -103,7 +103,10 @@ def ftp_check_merged(issue_name, ftp_session):
     logger.warning(f"check_merged {issue_string}")
     for name, facts in ftp_session.mlsd():
         if issue_string in name:
-            logger.warning(f"sess {name}")
+            try:
+                ftp_session.delete(name)
+            except Exception:
+                logger.warning(f"sess {name}")
 
 
 def ftp_check():
