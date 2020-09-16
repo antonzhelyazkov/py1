@@ -99,9 +99,11 @@ def check_status(file_to_check):
 
 
 def ftp_check_merged(issue_name, ftp_session):
-    logger.warning(f"check_merged {issue_name.replace('.mp4', '')}")
+    issue_string = issue_name.replace('.mp4', '')
+    logger.warning(f"check_merged {issue_string}")
     for name, facts in ftp_session.mlsd():
-        logger.warning(f"sess {name} {facts}")
+        if issue_string in name:
+            logger.warning(f"sess {name}")
 
 
 def ftp_check():
