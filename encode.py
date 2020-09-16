@@ -1,6 +1,7 @@
 import ftplib
 import getopt
 import json
+import logging
 import os
 import sys
 import re
@@ -314,6 +315,28 @@ def insert_upload_ts(file_to_register):
 config_open = open(config_file, encoding='utf-8')
 config_data = json.load(config_open)
 
+log_file_name = os.path.basename(sys.argv[0]).split(".")
+script_log = config_data['log_dir'] + "/" + log_file_name[0] + ".log"
+
+logger = logging.getLogger(__name__)
+# create handlers
+stream_h = logging.StreamHandler()
+file_h = logging.FileHandler(script_log)
+
+stream_h.setLevel(logging.INFO)
+file_h.setLevel(logging.INFO)
+
+formatter_stream = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
+formatter_file = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+if verbose:
+    stream_h.setFormatter(formatter_stream)
+
+file_h.setFormatter(formatter_file)
+
+logger.addHandler(stream_h)
+logger.addHandler(file_h)
+
 pid_file_path = config_data['pid_file_path']
 
 file_name = os.path.basename(sys.argv[0]).split(".")
@@ -332,11 +355,11 @@ else:
 time.sleep(int(config_data['delay']))
 
 for server_ip, issue_arr in ftp_check().items():
-    print(server_ip, issue_arr)
+    logger.warning(f"ftp {server_ip} issues {issue_arr}")
     for issue in issue_arr:
-        # print(issue)
+        logger.warning(f"process {issue}")
         issue_status, issue_id = check_status(issue)
-        print(issue_status, issue_id)
+        logger.warning(f"status {issue_status} id {issue_id}")
         if issue_status:
             print(server_ip, issue, issue_id)
             print(f"join {ftp_check_join(issue, server_ip)}")
