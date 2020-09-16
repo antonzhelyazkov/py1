@@ -103,7 +103,6 @@ def ftp_check_merged(issue_name, ftp_session):
     issue_string = issue_name.replace('.mp4', '')
     logger.warning(f"check_merged {issue_string}")
     for name, facts in ftp_session.mlsd():
-        logger.warning(name)
         currnet_match = re.match(pattern, name)
         if currnet_match:
             logger.warning(name)
