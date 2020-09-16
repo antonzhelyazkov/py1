@@ -99,10 +99,12 @@ def check_status(file_to_check):
 
 
 def ftp_check_merged(issue_name, ftp_session):
+    pattern = "\d+of\d+\.mp4"
     issue_string = issue_name.replace('.mp4', '')
     logger.warning(f"check_merged {issue_string}")
     for name, facts in ftp_session.mlsd():
-        if issue_string in name:
+        currnet_match = re.compile(pattern, name)
+        if currnet_match:
             try:
                 ftp_session.delete(name)
             except Exception:
