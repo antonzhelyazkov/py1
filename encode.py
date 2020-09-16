@@ -108,7 +108,7 @@ def ftp_check_merged(issue_name, ftp_session, log_dir):
         if curr_match:
             return_value = False
             logger.warning(f"not merged {name} - delete")
-            # ftp_session.delete(name)
+            ftp_session.delete(name)
             for name_log, facts_log in ftp_session.mlsd(log_dir):
                 if issue_string in name_log:
                     log_file_to_delete = log_dir + "/" + name_log
