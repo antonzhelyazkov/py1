@@ -104,6 +104,7 @@ def ftp_check_merged(issue_name, ftp_session):
     logger.warning(f"check_merged {issue_string}")
     for name, facts in ftp_session.mlsd():
         currnet_match = re.match(pattern, name)
+        print(currnet_match)
         if currnet_match:
             logger.warning(name)
         else:
