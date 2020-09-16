@@ -35,7 +35,7 @@ for opt, arg in opts:
 
 
 def parse_log_file(log_file):
-    string_to_search = '[Output file information #1]'
+    string_to_search = '[Output file information #'
     data_string = open(log_file, encoding='utf16').read()
     if string_to_search in data_string:
         return True
