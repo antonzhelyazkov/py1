@@ -99,8 +99,7 @@ def check_status(file_to_check):
 
 
 def ftp_check_merged(issue_name):
-    issue_name.replace('.mp4', '')
-    logger.warning(f"check_merged {issue_name}")
+    logger.warning(f"check_merged {issue_name.replace('.mp4', '')}")
 
 
 def ftp_check():
