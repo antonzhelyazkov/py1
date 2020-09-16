@@ -99,13 +99,13 @@ def check_status(file_to_check):
 
 
 def ftp_check_merged(issue_name, ftp_session, log_dir):
-    pattern = re.compile('\d+of\d+\.mp4')
+    pattern = '\d+of\d+\.mp4'
     # pattern = "mp4"
     issue_string = issue_name.replace('.mp4', '')
     logger.warning(f"check_merged {issue_string}")
     for name, facts in ftp_session.mlsd():
         print(pattern, name)
-        curr_match = pattern.match(name)
+        curr_match = re.match(pattern, name)
         print(curr_match)
         if curr_match:
             logger.warning(name)
