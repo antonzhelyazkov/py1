@@ -119,8 +119,8 @@ def ftp_check():
             local_file = open(filename, 'wb')
             session.retrbinary('RETR ' + ftp_path + "/" + name, local_file.write, 1024)
             local_file.close()
-            if parse_log_file(filename, session):
-                # ftp_check_merged(logfile_to_name(name))
+            if parse_log_file(filename):
+                ftp_check_merged(logfile_to_name(name), session)
                 tmp_arr.append(logfile_to_name(name))
             os.remove(filename)
         session.close()
