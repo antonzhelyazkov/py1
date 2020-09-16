@@ -100,19 +100,20 @@ def check_status(file_to_check):
 
 def ftp_check_merged(issue_name, ftp_session, log_dir):
     pattern = '\d+of\d+\.mp4'
-    # pattern = "mp4"
     issue_string = issue_name.replace('.mp4', '')
     logger.warning(f"check_merged {issue_string}")
     for name, facts in ftp_session.mlsd():
         curr_match = re.search(pattern, name)
         if curr_match:
-            logger.warning(name)
+            logger.warning(f"not merged {name} - delete")
+            # ftp_session.delete(name)
+            for name_log, facts_log in ftp_session.mlsd(log_dir):
+                if issue_string in name_log:
+                    log_file_to_delete = log_dir + "/" + name_log
+                    logger.warning(f"file {log_file_to_delete} will be deleted")
+                    ftp_session.delete(log_file_to_delete)
         else:
-            logger.warning(f"not matched {name}")
-
-    for name, facts in ftp_session.mlsd(log_dir):
-        if issue_string in name:
-            logger.warning(name)
+            logger.warning(f"Correct {name}")
 
 
 def ftp_check():
