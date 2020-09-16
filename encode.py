@@ -98,6 +98,9 @@ def check_status(file_to_check):
         return False, result
 
 
+def ftp_check_merged(issue_name):
+    logger.warning(issue_name)
+
 def ftp_check():
     ftp_path = "log"
     ftp_map = {}
@@ -114,6 +117,7 @@ def ftp_check():
             session.retrbinary('RETR ' + ftp_path + "/" + name, local_file.write, 1024)
             local_file.close()
             if parse_log_file(filename):
+                ftp_check_merged(logfile_to_name(name))
                 tmp_arr.append(logfile_to_name(name))
             os.remove(filename)
         session.close()
