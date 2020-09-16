@@ -3,6 +3,7 @@ import os
 import sys
 import getopt
 import logging
+import re
 
 config_file = "./config.json"
 verbose = False
@@ -48,5 +49,18 @@ file_h.setFormatter(formatter_file)
 logger.addHandler(stream_h)
 logger.addHandler(file_h)
 
-for item in config_data['channels']:
-    logger.warning(f"{item} {config_data['channels'][item]}")
+string_parse = ['bnt1_sto-procenta-budni_16-09-2020_09-10 - 1of4.mp4',
+                'bnt1_sto-procenta-budni_16-09-2020_09-10 - 2of4.mp4',
+                'bnt1_sto-procenta-budni_16-09-2020_09-10 - 3of4.mp4',
+                'bnt1_sto-procenta-budni_16-09-2020_09-10 - 4of4 - Copy.mp4',
+                'bnt1_sto-procenta-budni_16-09-2020_09-10 - 4of4.mp4']
+
+pattern = '\d+of\d+\.mp4'
+for item in string_parse:
+    print(item)
+    curr_match = re.search(pattern, item)
+    print(curr_match)
+    if curr_match:
+        print("sadasda")
+    else:
+        print("adasdas")
