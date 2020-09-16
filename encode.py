@@ -107,6 +107,7 @@ def ftp_check_merged(issue_name, ftp_session):
         if currnet_match:
             logger.warning(name)
 
+
 def ftp_check():
     ftp_path = "log"
     ftp_map = {}
