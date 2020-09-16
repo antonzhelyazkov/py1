@@ -105,11 +105,7 @@ def ftp_check_merged(issue_name, ftp_session):
     for name, facts in ftp_session.mlsd():
         currnet_match = re.compile(pattern, name)
         if currnet_match:
-            try:
-                ftp_session.delete(name)
-            except Exception:
-                logger.warning(f"sess {name}")
-
+            logger.warning(name)
 
 def ftp_check():
     ftp_path = "log"
