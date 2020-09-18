@@ -1,14 +1,15 @@
+import datetime
+import ftplib
 import json
 import os
 import sys
 import getopt
 import logging
-import re
+from datetime import datetime, timedelta
 
 config_file = "./config.json"
 verbose = False
-file_to_upload = "d:/application_security_verification_report_2019_04_03.pdf"
-
+file_to = "d:/application_security_verification_report_2019_04_03.pdf"
 
 argv = sys.argv[1:]
 
@@ -51,16 +52,28 @@ file_h.setFormatter(formatter_file)
 logger.addHandler(stream_h)
 logger.addHandler(file_h)
 
-def modify_stamp_to_unixtimestamp(date_stamp):
-    dt = datetime.datetime(int(date_stamp), format('%Y%m%d%H%M%S'))
-    return dt
 
-#2020 09 16 07 06 38
+def modify_stamp_to_unix_timestamp(date_stamp):
+    year = int(date_stamp[0] + date_stamp[1] + date_stamp[2] + date_stamp[3])
+    month = int(date_stamp[4] + date_stamp[5])
+    day = int(date_stamp[6] + date_stamp[7])
+    hour = int(date_stamp[8] + date_stamp[9])
+    minutes = int(date_stamp[10] + date_stamp[11])
+    seconds = int(date_stamp[12] + date_stamp[13])
+    issue_datestamp = datetime(year, month, day, hour, minutes, seconds)
+    return round(datetime.timestamp(issue_datestamp))
+
+# 2020 09 16 07 06 38
 
 
 def ftp_clear_old_files(ftp_session):
+    yesterday = datetime.today() - timedelta(days=1)
+    time_yesterday = round(datetime.timestamp(yesterday))
     for name, facts in ftp_session.mlsd():
-        print(modify_stamp_to_unixtimestamp(facts['modify']))
+        # logger.warning(f"{time_yesterday} {modify_stamp_to_unix_timestamp(facts['modify'])}")
+        if int(time_yesterday) > int(modify_stamp_to_unix_timestamp(facts['modify'])):
+            print(f"try to delete {name}")
+            ftp_session.delete(name)
 
 
 def ftp_upload(file_to_upload):
@@ -77,7 +90,7 @@ def ftp_upload(file_to_upload):
     return check_flag
 
 
-if ftp_upload(file_to_uload):
+if ftp_upload(file_to):
     print("OK")
 else:
     print("Error")
