@@ -156,7 +156,6 @@ file_h.setFormatter(formatter_file)
 logger.addHandler(stream_h)
 logger.addHandler(file_h)
 
-logger.warning("qweqweqwe")
 
 dst_root = config_data['tmp_dir'].rstrip('/')
 pid_file_path = config_data['pid_file_path']
