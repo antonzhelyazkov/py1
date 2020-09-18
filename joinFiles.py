@@ -177,7 +177,7 @@ for media in config_data['media']:
 #            ffmpeg_output_file = dst_dir + "/output.txt"
             destination_file = dst_dir + "/" + issue_name + ".mp4"
             create_chlist(expected_start, expected_end, chunk_list_file, media)
-#            print(f"cp {chunk_list_file} {debug_file}")
+            print(f"cp {chunk_list_file} {debug_file}")
             shutil.copyfile(chunk_list_file, debug_file)
             join_files(chunk_list_file, destination_file)
             if check_duration(destination_file, expected_start, expected_end):
