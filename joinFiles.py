@@ -82,7 +82,7 @@ def modify_stamp_to_unix_timestamp(date_stamp):
 
 
 def ftp_clear_old_files(ftp_session):
-    yesterday = datetime.today() - timedelta(days=1)
+    yesterday = datetime.today() - timedelta(days=0)
     time_yesterday = round(datetime.timestamp(yesterday))
     for name, facts in ftp_session.mlsd():
         logger.warning(f"{time_yesterday} {modify_stamp_to_unix_timestamp(facts['modify'])}")
