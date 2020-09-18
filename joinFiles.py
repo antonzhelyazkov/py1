@@ -167,6 +167,7 @@ for media in config_data['media']:
             "%d-%m-%Y_%H-%M")
         if expected_end < currentTS and item['processed'] == 'false':
             dst_dir = dst_root + "/" + issue_name
+            print(dst_dir)
             debug_file = dst_root + "/" + issue_name + ".list"
             if os.path.exists(dst_dir):
                 shutil.rmtree(dst_dir)
