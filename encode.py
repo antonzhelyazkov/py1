@@ -35,7 +35,7 @@ for opt, arg in opts:
 
 
 def parse_log_file(log_file):
-    string_to_search = '[Output file information #1]'
+    string_to_search = '[Output file information #'
     data_string = open(log_file, encoding='utf16').read()
     if string_to_search in data_string:
         return True
@@ -99,22 +99,24 @@ def check_status(file_to_check):
 
 
 def ftp_check_merged(issue_name, ftp_session, log_dir):
+    return_value = True
     pattern = '\d+of\d+\.mp4'
-    # pattern = "mp4"
     issue_string = issue_name.replace('.mp4', '')
     logger.warning(f"check_merged {issue_string}")
     for name, facts in ftp_session.mlsd():
-        print(pattern, name)
-        curr_match = re.match(pattern, name)
-        print(curr_match)
+        curr_match = re.search(pattern, name)
         if curr_match:
-            logger.warning(name)
+            return_value = False
+            logger.warning(f"not merged {name} - delete")
+            ftp_session.delete(name)
+            for name_log, facts_log in ftp_session.mlsd(log_dir):
+                if issue_string in name_log:
+                    log_file_to_delete = log_dir + "/" + name_log
+                    logger.warning(f"file {log_file_to_delete} will be deleted")
+                    ftp_session.delete(log_file_to_delete)
         else:
-            logger.warning(f"not matched {name}")
-
-    for name, facts in ftp_session.mlsd(log_dir):
-        if issue_string in name:
-            logger.warning(name)
+            logger.warning(f"Correct {name}")
+    return return_value
 
 
 def ftp_check():
@@ -132,8 +134,7 @@ def ftp_check():
             local_file = open(filename, 'wb')
             session.retrbinary('RETR ' + ftp_path + "/" + name, local_file.write, 1024)
             local_file.close()
-            if parse_log_file(filename):
-                ftp_check_merged(logfile_to_name(name), session, ftp_path)
+            if parse_log_file(filename) and ftp_check_merged(logfile_to_name(name), session, ftp_path):
                 tmp_arr.append(logfile_to_name(name))
             os.remove(filename)
         session.close()
@@ -380,21 +381,21 @@ for server_ip, issue_arr in ftp_check().items():
         logger.warning(f"process {issue}")
         issue_status, issue_id = check_status(issue)
         logger.warning(f"status {issue_status} id {issue_id}")
-#        if issue_status:
-#            print(server_ip, issue, issue_id)
-#            print(f"join {ftp_check_join(issue, server_ip)}")
-#            update_encoder_ip(issue_id)
-#            ftp_get_file(server_ip, issue, issue_id)
-#            qm2 = encode_files_qm2(issue, issue_id)
-#            insert_upload(qm2)
-#            ts = encode_files_ts(issue, issue_id)
-#            insert_upload_ts(ts)
-#            sd2 = encode_files_sd2(issue, issue_id)
-#            insert_upload(sd2)
-#            fhd = encode_files_fhd(issue, issue_id)
-#            insert_upload(fhd)
-#            ftp_remove_files(issue, server_ip)
-#            update_status(issue_id, "done")
-#            os.remove(config_data['tmp_dir'] + "/" + issue)
-#            print(qm2, sd2, fhd)
+        if issue_status:
+            print(server_ip, issue, issue_id)
+            print(f"join {ftp_check_join(issue, server_ip)}")
+            update_encoder_ip(issue_id)
+            ftp_get_file(server_ip, issue, issue_id)
+            qm2 = encode_files_qm2(issue, issue_id)
+            insert_upload(qm2)
+            ts = encode_files_ts(issue, issue_id)
+            insert_upload_ts(ts)
+            sd2 = encode_files_sd2(issue, issue_id)
+            insert_upload(sd2)
+            fhd = encode_files_fhd(issue, issue_id)
+            insert_upload(fhd)
+            ftp_remove_files(issue, server_ip)
+            update_status(issue_id, "done")
+            os.remove(config_data['tmp_dir'] + "/" + issue)
+            print(qm2, sd2, fhd)
 os.remove(pid_file)
