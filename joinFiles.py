@@ -89,10 +89,7 @@ def ftp_clear_old_files(ftp_session):
         logger.warning(f"INFO {time_yesterday} {issue_time}")
         if int(time_yesterday) > issue_time:
             logger.warning(f"DELETE {name} {time_yesterday} {issue_time}")
-            try:
-                ftp_session.delete(name)
-            except Exception:
-                logger.warning(f"could not delete {name}")
+            ftp_session.delete(name)
 
 
 def ftp_upload(file_to_upload):
