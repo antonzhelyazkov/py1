@@ -11,6 +11,7 @@ import mysql.connector
 import requests
 
 config_file = "./config.json"
+log_dir = "."
 local_ip = requests.get('https://checkip.amazonaws.com').text.strip()
 
 argv = sys.argv[1:]
@@ -102,20 +103,20 @@ def ftp_check_merged(issue_name, ftp_session, log_dir):
     return_value = True
     pattern = '\d+of\d+\.mp4'
     issue_string = issue_name.replace('.mp4', '')
-    logger.warning(f"check_merged {issue_string}")
+    print_log(verbose, f"check_merged {issue_string}")
     for name, facts in ftp_session.mlsd():
         curr_match = re.search(pattern, name)
         if curr_match:
             return_value = False
-            logger.warning(f"not merged {name} - delete")
+            print_log(verbose, f"not merged {name} - delete")
             ftp_session.delete(name)
             for name_log, facts_log in ftp_session.mlsd(log_dir):
                 if issue_string in name_log:
                     log_file_to_delete = log_dir + "/" + name_log
-                    logger.warning(f"file {log_file_to_delete} will be deleted")
+                    print_log(verbose, f"file {log_file_to_delete} will be deleted")
                     ftp_session.delete(log_file_to_delete)
         else:
-            logger.warning(f"Correct {name}")
+            print_log(verbose, f"Correct {name}")
     return return_value
 
 
@@ -331,6 +332,25 @@ def insert_upload_ts(file_to_register):
     vod_conn.close()
 
 
+def print_log(debug, message):
+    try:
+        current_log_dir = config_data['log_dir']
+    except Exception:
+        current_log_dir = log_dir
+
+    if os.path.isdir(current_log_dir):
+        log_file_name = os.path.basename(sys.argv[0]).split(".")
+        script_log = current_log_dir + "/" + log_file_name[0] + ".log"
+        logging.basicConfig(filename=script_log, level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
+        logging.info(message)
+        if debug is True:
+            print(message)
+
+    else:
+        print(f"log directory does not exist {current_log_dir}")
+        exit(1)
+
+
 #############
 
 config_open = open(config_file, encoding='utf-8')
@@ -338,25 +358,6 @@ config_data = json.load(config_open)
 
 log_file_name = os.path.basename(sys.argv[0]).split(".")
 script_log = config_data['log_dir'] + "/" + log_file_name[0] + ".log"
-
-logger = logging.getLogger(__name__)
-# create handlers
-stream_h = logging.StreamHandler()
-file_h = logging.FileHandler(script_log)
-
-stream_h.setLevel(logging.INFO)
-file_h.setLevel(logging.INFO)
-
-formatter_stream = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
-formatter_file = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
-if verbose:
-    stream_h.setFormatter(formatter_stream)
-
-file_h.setFormatter(formatter_file)
-
-logger.addHandler(stream_h)
-logger.addHandler(file_h)
 
 pid_file_path = config_data['pid_file_path']
 
@@ -376,11 +377,11 @@ else:
 time.sleep(int(config_data['delay']))
 
 for server_ip, issue_arr in ftp_check().items():
-    logger.warning(f"ftp {server_ip} issues {issue_arr}")
+    print_log(verbose, f"ftp {server_ip} issues {issue_arr}")
     for issue in issue_arr:
-        logger.warning(f"process {issue}")
+        print_log(verbose,f"process {issue}")
         issue_status, issue_id = check_status(issue)
-        logger.warning(f"status {issue_status} id {issue_id}")
+        print_log(verbose, f"status {issue_status} id {issue_id}")
         if issue_status:
             print(server_ip, issue, issue_id)
             print(f"join {ftp_check_join(issue, server_ip)}")
