@@ -1,7 +1,8 @@
+import logging
 import os.path
 import sys
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 import time
 import getopt
 import shutil
@@ -10,11 +11,11 @@ import ftplib
 import mysql.connector
 
 config_file = "./config.json"
-
+verbose = False
 argv = sys.argv[1:]
 
 try:
-    opts, argv = getopt.getopt(argv, "c:", ["config="])
+    opts, argv = getopt.getopt(argv, "c:v", ["config=", "verbose"])
 except getopt.GetoptError as err:
     print(err)
     opts = []
@@ -22,6 +23,8 @@ except getopt.GetoptError as err:
 for opt, arg in opts:
     if opt in ['-c', '--config']:
         config_file = arg
+    if opt in ['-v', '--verbose']:
+        verbose = True
     else:
         print("HELP")
 
@@ -67,6 +70,28 @@ def check_duration(dst_file, start_time, end_time):
         return False
 
 
+def modify_stamp_to_unix_timestamp(date_stamp):
+    year = int(date_stamp[0] + date_stamp[1] + date_stamp[2] + date_stamp[3])
+    month = int(date_stamp[4] + date_stamp[5])
+    day = int(date_stamp[6] + date_stamp[7])
+    hour = int(date_stamp[8] + date_stamp[9])
+    minutes = int(date_stamp[10] + date_stamp[11])
+    seconds = int(date_stamp[12] + date_stamp[13])
+    issue_datestamp = datetime(year, month, day, hour, minutes, seconds)
+    return round(datetime.timestamp(issue_datestamp))
+
+
+def ftp_clear_old_files(ftp_session):
+    yesterday = datetime.today() - timedelta(days=1)
+    time_yesterday = round(datetime.timestamp(yesterday))
+    for name, facts in ftp_session.mlsd():
+        issue_time = int(modify_stamp_to_unix_timestamp(facts['modify']))
+        logger.warning(f"INFO {time_yesterday} {issue_time}")
+        if int(time_yesterday) > issue_time:
+            logger.warning(f"DELETE {name} {time_yesterday} {issue_time}")
+            ftp_session.delete(name)
+
+
 def ftp_upload(file_to_upload):
     check_flag = False
     for ftp_server in config_data['ftp_hosts']:
@@ -74,6 +99,7 @@ def ftp_upload(file_to_upload):
         file = open(file_to_upload, 'rb')  # file to send
         session.storbinary('STOR ' + os.path.basename(file_to_upload), file)  # send the file
         file.close()  # close file and FTP
+        ftp_clear_old_files(session)
         session.quit()
         check_flag = True
 
@@ -107,6 +133,29 @@ else:
 
 config_open = open(config_file, encoding='utf-8')
 config_data = json.load(config_open)
+
+file_name = os.path.basename(sys.argv[0]).split(".")
+log_file = config_data['log_dir'] + "/" + file_name[0] + ".log"
+
+logger = logging.getLogger(__name__)
+# create handlers
+stream_h = logging.StreamHandler()
+file_h = logging.FileHandler(log_file)
+
+stream_h.setLevel(logging.INFO)
+file_h.setLevel(logging.INFO)
+
+formatter_stream = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
+formatter_file = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+if verbose:
+    stream_h.setFormatter(formatter_stream)
+
+file_h.setFormatter(formatter_file)
+
+logger.addHandler(stream_h)
+logger.addHandler(file_h)
+
 
 dst_root = config_data['tmp_dir'].rstrip('/')
 pid_file_path = config_data['pid_file_path']
