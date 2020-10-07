@@ -31,6 +31,16 @@ for opt, arg in opts:
     else:
         print("HELP")
 
+try:
+    config_open = open(config_file, encoding='utf-8')
+except FileNotFoundError:
+    print(f"file {config_file} does not exists")
+    sys.exit()
+else:
+    print(f"file {config_file} found")
+
+config_open = open(config_file, encoding='utf-8')
+config_data = json.load(config_open)
 
 #############
 
@@ -336,25 +346,22 @@ def print_log(debug, message):
     try:
         current_log_dir = config_data['log_dir']
     except Exception:
+        print(f"log_dir configuration not found")
         current_log_dir = log_dir
 
     if os.path.isdir(current_log_dir):
-        log_file_name = os.path.basename(sys.argv[0]).split(".")
         script_log = current_log_dir + "/" + log_file_name[0] + ".log"
-        logging.basicConfig(filename=script_log, level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
-        logging.info(message)
-        if debug is True:
-            print(message)
-
     else:
-        print(f"log directory does not exist {current_log_dir}")
-        exit(1)
+        script_log = log_dir + "/" + log_file_name[0] + ".log"
+
+    logging.basicConfig(filename=script_log, level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
+    logging.info(message)
+
+    if debug is True:
+        print(message)
 
 
 #############
-
-config_open = open(config_file, encoding='utf-8')
-config_data = json.load(config_open)
 
 log_file_name = os.path.basename(sys.argv[0]).split(".")
 script_log = config_data['log_dir'] + "/" + log_file_name[0] + ".log"
