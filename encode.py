@@ -371,11 +371,11 @@ def print_log(debug, message):
 
 def try_files(file):
     if os.path.isfile(file):
-        return True
         print_log(verbose, f"file exists {file}")
-    else:
         return True
+    else:
         print_log(verbose, f"file DOES NOT exist {file}")
+        return False
 
 
 #############
