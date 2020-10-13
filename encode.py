@@ -42,6 +42,7 @@ else:
 config_open = open(config_file, encoding='utf-8')
 config_data = json.load(config_open)
 
+
 #############
 
 
@@ -178,7 +179,6 @@ def ftp_remove_files(file_to_get, ftp_server):
 
 
 def ftp_check_log_dir(ftp_server, directory):
-
     session = ftplib.FTP(ftp_server)
     session.login(user=config_data['out_ftp_user'], passwd=config_data['out_ftp_pass'])
     dirs_arr = []
@@ -218,6 +218,8 @@ def ftp_check_join(file_to_get, ftp_server):
 
 def encode_files_qm2(file_to_encode, issue_id_local):
     input_file = config_data['tmp_dir'] + "/" + file_to_encode
+    try_files(input_file)
+    print_log(verbose, f"start encoding qm2 {input_file}")
     file_qm2 = config_data['out_dir'] + "/" + file_to_encode.replace('.mp4', '_qm2.mp4')
 
     if verbose:
@@ -241,6 +243,8 @@ def encode_files_qm2(file_to_encode, issue_id_local):
 
 def encode_files_ts(file_to_encode, issue_id_local):
     input_file = config_data['tmp_dir'] + "/" + file_to_encode
+    try_files(input_file)
+    print_log(verbose, f"start encoding ts {input_file}")
     file_ts = config_data['out_dir'] + "/" + file_to_encode.replace('.mp4', '_sd2.ts')
 
     if verbose:
@@ -264,6 +268,8 @@ def encode_files_ts(file_to_encode, issue_id_local):
 
 def encode_files_sd2(file_to_encode, issue_id_local):
     input_file = config_data['tmp_dir'] + "/" + file_to_encode
+    try_files(input_file)
+    print_log(verbose, f"start encoding sd2 {input_file}")
     file_sd2 = config_data['out_dir'] + "/" + file_to_encode.replace('.mp4', '_sd2.mp4')
 
     if verbose:
@@ -287,6 +293,8 @@ def encode_files_sd2(file_to_encode, issue_id_local):
 
 def encode_files_fhd(file_to_encode, issue_id_local):
     input_file = config_data['tmp_dir'] + "/" + file_to_encode
+    try_files(input_file)
+    print_log(verbose, f"start encoding fhd {input_file}")
     file_fhd = config_data['out_dir'] + "/" + file_to_encode.replace('.mp4', '_fhd.mp4')
 
     if verbose:
@@ -361,8 +369,16 @@ def print_log(debug, message):
         print(message)
 
 
-#############
+def try_files(file):
+    if os.path.isfile(file):
+        return True
+        print_log(verbose, f"file exists {file}")
+    else:
+        return True
+        print_log(verbose, f"file DOES NOT exist {file}")
 
+
+#############
 log_file_name = os.path.basename(sys.argv[0]).split(".")
 script_log = config_data['log_dir'] + "/" + log_file_name[0] + ".log"
 
@@ -386,7 +402,7 @@ time.sleep(int(config_data['delay']))
 for server_ip, issue_arr in ftp_check().items():
     print_log(verbose, f"ftp {server_ip} issues {issue_arr}")
     for issue in issue_arr:
-        print_log(verbose,f"process {issue}")
+        print_log(verbose, f"process {issue}")
         issue_status, issue_id = check_status(issue)
         print_log(verbose, f"status {issue_status} id {issue_id}")
         if issue_status:
